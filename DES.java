@@ -87,8 +87,7 @@ private static final byte[] PC2 = {
     30, 40, 51, 45, 33, 48,
     44, 49, 39, 56, 34, 53,
     46, 42, 50, 36, 29, 32};
-private static final byte[] rotations = {
-    1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};   
+private static final byte[] rotations = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};   
 private static long IP(long src)  { return permute(IP, 64, src);                 } // 64-bit output
 private static long FP(long src)  { return permute(FP, 64, src);                 } // 64-bit output
 private static long E(int src)    { return permute(E, 32, src&0xFFFFFFFFL);      } // 48-bit output
@@ -109,7 +108,7 @@ private static byte S(int boxNumber, byte src) {
 }
 private static long getLongFromBytes(byte[] ba, int offset) {
     long l = 0;
-    for (int i=0; i<8; i++) {
+    for(int i=0; i<8; i++){
         byte value;
         if ((offset+i) < ba.length)
             value = ba[offset+i]; 
@@ -120,16 +119,15 @@ private static long getLongFromBytes(byte[] ba, int offset) {
     return l;
 }
 private static void getBytesFromLong(byte[] ba, int offset, long l) {
-    for (int i=7; i>=0; i--) {
+    for(int i=7; i>=0; i--){
         if ((offset+i) < ba.length) {
             ba[offset+i] = (byte) (l & 0xFF);
             l = l >> 8;
-        } else {
-            break;
-        }
+        } 
+        else break;
     }
 }
-private static int feistel(int r, /* 48 bits */ long subkey) {
+private static int feistel(int r, /* 48 bits */ long subkey){
     long e = E(r);
     long x = e ^ subkey;
     int dst = 0;
@@ -141,12 +139,12 @@ private static int feistel(int r, /* 48 bits */ long subkey) {
     }
     return P(dst);
 }    
-private static long[] createSubkeys(/* 64 bits */ long key) {
+private static long[] createSubkeys(/* 64 bits */ long key){
         long subkeys[] = new long[16];
         key = PC1(key);
         int c = (int) (key>>28);
         int d = (int) (key&0x0FFFFFFF);
-        for (int i=0; i<16; i++){
+        for(int i=0; i<16; i++){
             if (rotations[i] == 1){
                 c = ((c<<1) & 0x0FFFFFFF) | (c>>27);
                 d = ((d<<1) & 0x0FFFFFFF) | (d>>27);
@@ -187,7 +185,7 @@ public static void encryptBlock(
     long c = encryptBlock(m, k);
     getBytesFromLong(ciphertext, ciphertextOffset, c);
 }
-public static byte[] encrypt(byte[] message, byte[] key) {
+public static byte[] encrypt(byte[] message, byte[] key){
         byte[] ciphertext = new byte[message.length];
         for (int i=0; i<message.length; i+=8)
             encryptBlock(message, i, ciphertext, i, key);
@@ -196,7 +194,7 @@ public static byte[] encrypt(byte[] message, byte[] key) {
 public static byte[] encrypt(byte[] challenge, String password){
         return encrypt(challenge, passwordToKey(password));
 }   
-private static byte[] passwordToKey(String password) {
+private static byte[] passwordToKey(String password){
     byte[] pwbytes = password.getBytes();
     byte[] key = new byte[8];
     for (int i=0; i<8; i++) {
@@ -216,7 +214,7 @@ private static byte[] passwordToKey(String password) {
     }
     return key;
 }
-private static int charToNibble(char c) {
+private static int charToNibble(char c){
     if (c>='0' && c<='9')
         return (c-'0');
     else if (c>='a' && c<='f')
@@ -226,26 +224,26 @@ private static int charToNibble(char c) {
     else 
         return 0;
 }
-private static byte[] parseBytes(String s) {
+private static byte[] parseBytes(String s){
     s = s.replace(" ", "");
     byte[] ba = new byte[s.length()/2];
-    if (s.length()%2 > 0) { s = s+'0'; }
+    if (s.length()%2 > 0) s = s+'0';
     for (int i=0; i<s.length(); i+=2) {
         ba[i/2] = (byte) (charToNibble(s.charAt(i))<<4 | charToNibble(s.charAt(i+1)));
     }
     return ba;
 }
-private static String hex(byte[] bytes) {
+private static String hex(byte[] bytes){
     StringBuilder sb = new StringBuilder();
     for (int i=0; i<bytes.length; i++)
         sb.append(String.format("%02X ",bytes[i]));
     return sb.toString();
 }
-public static boolean test(byte[] message, byte[] expected, String password) {
+public static boolean test(byte[] message, byte[] expected, String password){
     return test(message, expected, passwordToKey(password));
 }    
 private static int testCount = 0;
-public static boolean test(byte[] message, byte[] expected, byte[] key) {
+public static boolean test(byte[] message, byte[] expected, byte[] key){
     System.out.println("Test #"+(++testCount)+":");
     System.out.println("\tmessage:  "+hex(message));
     System.out.println("\tkey:      "+hex(key));
@@ -256,4 +254,4 @@ public static boolean test(byte[] message, byte[] expected, byte[] key) {
     System.out.println("\tverdict: "+(result?"PASS":"FAIL"));
     return result;
 }
-
+}

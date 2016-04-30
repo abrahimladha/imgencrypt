@@ -14,9 +14,9 @@ private int p = 1234535;
         p = px;
     }
     int getPower(){
-        return Math.random() * p;
+        return (int)(Math.random() * p);
     }
     int getExponent(int a){
-        return (Math.pow(g,a) % p);
+        return (int)(Math.pow(g,a) % p);
     }
 }
