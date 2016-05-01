@@ -262,4 +262,40 @@ long[] SB3 = {
         0x1948C25CL, 0x02FB8A8CL, 0x01C36AE4L, 0xD6EBE1F9L, 
         0x90D4F869L, 0xA65CDEA0L, 0x3F09252DL, 0xC208E69FL, 
         0xB74E6132L, 0xCE77E25BL, 0x578FDFE3L, 0x3AC372E6L};
+
+long[] P;
+public static byte[] encrypt(byte[] unencrypted){
+    if(unencrypted.length != 64){
+        return null;
+        System.out.println("something has gone horribly wrong");
+    }
+    byte[] xl = new byte[32];
+    byte[] xr = new byte[32];
+    for(int i = 0; i < 32; i++){
+        xl[i] = unencrypted[i];
+        xr[i+32] = unencrypted[i+32];
+    }
+    
+    for(int i = 0; i < 16; i++){
+        for(int x = 0; x < 32; x++)
+            xl[x] = (byte)(xl[x] ^ P[i]);
+        
+        for(int x = 0; x < 32; x++)
+            xr[x] = (byte)(xr[x] ^ F(xl[x]));
+    
+    }
+
+
+
+
+}
+public static byte F(byte b){
+    return b;
+}
+public static byte[] makeParray(){
+    long[] temp = new P[18];
+    for(int i = 0; i < 18; i++)
+        temp[i] = (long)(Math.random() + Long.MAX_VALUE);
+    //?
+}
 }
