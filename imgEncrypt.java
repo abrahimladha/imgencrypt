@@ -23,9 +23,11 @@ public static String FILE = "fast.png";
 public static HashMap<Object, Object> BUFFER = new HashMap<>();
 public static ImageView before = new ImageView(FILE);
 public static ImageView after = new ImageView(FILE);
+public static TextField filepath = new TextField(FILE);
 public static void main(String[] args) throws Exception { launch(args); }
+public static HBox hb = new HBox(4);
 @Override public void start(final Stage stage) throws Exception {        
-    HBox hb = new HBox(4);
+    //HBox hb = new HBox(4);
     HBox hb1 = new HBox(4);
     VBox vb = new VBox(4);
     Button go = new Button("Go!");
@@ -37,7 +39,7 @@ public static void main(String[] args) throws Exception { launch(args); }
     cb2.getItems().addAll("DES encrypt","DES decrypt","VEA encrypt",
             "VEA decrypt","polynomial encrypt", "polynomial decrypt");
     
-    TextField filepath = new TextField(FILE);
+    
     Slider roundslider = new Slider();
     
     roundslider.setMin(0);
@@ -48,7 +50,7 @@ public static void main(String[] args) throws Exception { launch(args); }
     roundslider.setBlockIncrement(1);
     roundslider.setShowTickMarks(true);
     
-    hb.getChildren().addAll(before,after);
+    hb.getChildren().addAll(before);
     hb1.getChildren().addAll(cb1,cb2,filepath,roundslider,loader,go);
     
     vb.getChildren().addAll(hb,hb1);
@@ -65,12 +67,22 @@ public static void main(String[] args) throws Exception { launch(args); }
     byte[] output = DES.encryptCBC(unencrypted,unencrypted);
     }
     );
+    loader.setOnAction(e -> {
+        imageReloader();
+    });
+   
     /*
     Scene scene1 = new Scene(vb, 700, 725, Color.ALICEBLUE);
     stage.setTitle("IMAGE ENCRYPTION SECURITY");
     stage.setScene(scene1);
     stage.show();
     */
+}
+public static void imageReloader(){
+    FILE = filepath.getText();
+    hb.getChildren().removeAll(before);
+    before = new ImageView(FILE);
+    hb.getChildren().addAll(before);
 }
 public static void doEverything(String exchange, String encryption, String filename, String keyname){
     byte[] unencrypted = imgTobyteArray(filename);
@@ -89,8 +101,7 @@ public static void doEverything(String exchange, String encryption, String filen
         byte[] encrypted = DES.decryptCBC(unencrypted,key);
     }
     else if(encryption.equals("VEA ENCRYPT")){
-    
-    
+        byte[] encrypted = VEA.encrypt(unencrypted,key);
     }
     else if(encryption.equals("VEA DECRYPT")){
     

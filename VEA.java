@@ -1,5 +1,6 @@
+import java.util.*;
 public class VEA {
- long[] SB1 = { 
+static long[] SB1 = { 
         0xD1310BA6L, 0x98DFB5ACL, 0x2FFD72DBL, 0xD01ADFB7L, 
         0xB8E1AFEDL, 0x6A267E96L, 0xBA7C9045L, 0xF12C7F99L, 
         0x24A19947L, 0xB3916CF7L, 0x0801F2E2L, 0x858EFC16L, 
@@ -65,7 +66,7 @@ public class VEA {
         0xB6636521L, 0xE7B9F9B6L, 0xFF34052EL, 0xC5855664L, 
         0x53B02D5DL, 0xA99F8FA1L, 0x08BA4799L, 0x6E85076AL};
 
- long[] SB2 = {
+static long[] SB2 = {
         0x4B7A70E9L, 0xB5B32944L, 0xDB75092EL, 0xC4192623L,
         0xAD6EA6B0L, 0x49A7DF7DL, 0x9CEE60B8L, 0x8FEDB266L, 
         0xECAA8C71L, 0x699A17FFL, 0x5664526CL, 0xC2B19EE1L, 
@@ -131,7 +132,7 @@ public class VEA {
         0xC5C43465L, 0x713E38D8L, 0x3D28F89EL, 0xF16DFF20L, 
         0x153E21E7L, 0x8FB03D4AL, 0xE6E39F2BL, 0xDB83ADF7L};
 
-long[] SB3 = {
+static long[] SB3 = {
         0xE93D5A68L, 0x948140F7L, 0xF64C261CL, 0x94692934L,
         0x411520F7L, 0x7602D4F7L, 0xBCF46B2EL, 0xD4A20068L, 
         0xD4082471L, 0x3320F46AL, 0x43B7D4B7L, 0x500061AFL, 
@@ -197,7 +198,7 @@ long[] SB3 = {
         0x6FD5C7E7L, 0x56E14EC4L, 0x362ABFCEL, 0xDDC6C837L, 
         0xD79A3234L, 0x92638212L, 0x670EFA8EL, 0x406000E0L}; 
 
- long[] SB4 = {
+static long[] SB4 = {
         0x3A39CE37L, 0xD3FAF5CFL, 0xABC27737L, 0x5AC52D1BL,
         0x5CB0679EL, 0x4FA33742L, 0xD3822740L, 0x99BC9BBEL, 
         0xD5118E9DL, 0xBF0F7315L, 0xD62D1C7EL, 0xC700C47BL, 
@@ -262,40 +263,86 @@ long[] SB3 = {
         0x1948C25CL, 0x02FB8A8CL, 0x01C36AE4L, 0xD6EBE1F9L, 
         0x90D4F869L, 0xA65CDEA0L, 0x3F09252DL, 0xC208E69FL, 
         0xB74E6132L, 0xCE77E25BL, 0x578FDFE3L, 0x3AC372E6L};
-
-long[] P;
-public static byte[] encrypt(byte[] unencrypted){
-    if(unencrypted.length != 64){
-        return null;
-        System.out.println("something has gone horribly wrong");
+public static byte[] encryptmultiples(byte[] unencrypted, byte[] P){
+    int a  = unencrypted.length % 8;
+    int b = unencrypted.length / 8;
+    ArrayList<Byte> output = new ArrayList<>();
+    byte[] u = new byte[unencrypted.length - a];
+    for(int i = 0; i < unencrypted.length; i++)
+        u[i] = unencrypted[i];
+    for(int i = 0; i < b; i++){
+        byte[] temper = {unencrypted[i],unencrypted[i+1],unencrypted[i+2],unencrypted[i+3],unencrypted[i+4],
+        unencrypted[i+5],unencrypted[i+6],unencrypted[i+7]};
+        byte[] temp = encrypt(temper,P);
+        for(Byte bite : temp)
+            output.add(bite);
     }
-    byte[] xl = new byte[32];
-    byte[] xr = new byte[32];
-    for(int i = 0; i < 32; i++){
+    byte[] outputlist = new byte[output.size()];
+    for(int i = 0; i < outputlist.length; i++)
+        outputlist[i] = (byte)(output.get(i));
+    return outputlist;
+}
+
+public static byte[] encrypt(byte[] unencrypted, byte[] P){
+    if(unencrypted.length != 8){
+        System.out.println("something has gone horribly wrong");
+        return encryptmultiples(unencrypted,P);
+    }
+    byte[] xl = new byte[4];
+    byte[] xr = new byte[4];
+    for(int i = 0; i < 4; i++){
         xl[i] = unencrypted[i];
-        xr[i+32] = unencrypted[i+32];
+        xr[i+4] = unencrypted[i+4];
     }
     
     for(int i = 0; i < 16; i++){
-        for(int x = 0; x < 32; x++)
+        for(int x = 0; x < 4; x++)
             xl[x] = (byte)(xl[x] ^ P[i]);
-        
-        for(int x = 0; x < 32; x++)
-            xr[x] = (byte)(xr[x] ^ F(xl[x]));
-    
+        for(int x = 0; x < 4; x++)
+            xr[x] = (byte)(xr[x] ^ F(xl));
+        byte temp[] = xl;
+        xl = xr;
+        xr = temp;
     }
-
-
-
-
+    byte temp[] = xl;
+    xl = xr;
+    xr = temp;
+    for(int x = 0; x < 32; x++){
+        xl[x] = (byte)(xl[x] ^ P[16]);
+        xr[x] = (byte)(xr[x] ^ P[17]);
+    }
+    byte[] output = new byte[64];
+    for(int x = 0; x < 32; x++){
+        output[x] = xl[x];
+        output[x+32] =  xr[x];
+    }
+    return output;
 }
-public static byte F(byte b){
-    return b;
+public static byte[] keyflipper(byte[] P){
+    byte[] temp = new byte[18];
+    for(int x = 0; x < 16; x++)
+        temp[16 - x -1] = P[x];
+    temp[16] = P[17];
+    temp[17] = P[16];
+    return temp;
 }
-public static byte[] makeParray(){
-    long[] temp = new P[18];
-    for(int i = 0; i < 18; i++)
-        temp[i] = (long)(Math.random() + Long.MAX_VALUE);
-    //?
+public static byte[] decrypt(byte[] encrypted, byte[] P){
+    return encrypt(encrypted, keyflipper(P));
 }
+public static byte[] decryptmultiples(byte[] encrypted, byte[] P);
+public static byte F(byte[] thing){
+    Byte a, b, c, d;
+    a = thing[0];
+    b = thing[1];
+    c = thing[2];
+    d = thing[3];
+    int ai, bi, ci, di;
+    ai = a.intValue();
+    bi = b.intValue();
+    ci = c.intValue();
+    di = d.intValue();
+   return (byte)(((((SB1[ai]+SB2[bi])%(Integer.MAX_VALUE)) ^ SB3[ci]) + SB4[di])%(Integer.MAX_VALUE));
+    
+}
+
 }
