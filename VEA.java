@@ -329,7 +329,9 @@ public static byte[] keyflipper(byte[] P){
 public static byte[] decrypt(byte[] encrypted, byte[] P){
     return encrypt(encrypted, keyflipper(P));
 }
-public static byte[] decryptmultiples(byte[] encrypted, byte[] P);
+public static byte[] decryptmultiples(byte[] encrypted, byte[] P){
+    return decryptmultiples(encrypted, keyflipper(P));
+}
 public static byte F(byte[] thing){
     Byte a, b, c, d;
     a = thing[0];

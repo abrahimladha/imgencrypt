@@ -20,7 +20,7 @@ import java.nio.*;
 import javafx.embed.swing.SwingFXUtils; 
 public class imgEncrypt extends Application {
 public static String FILE = "fast.png";
-public static HashMap<Object, Object> BUFFER = new HashMap<>();
+public static HashMap<String, Integer> BUFFER = new HashMap<>();
 public static ImageView before = new ImageView(FILE);
 public static ImageView after = new ImageView(FILE);
 public static TextField filepath = new TextField(FILE);
@@ -88,11 +88,23 @@ public static void doEverything(String exchange, String encryption, String filen
     byte[] unencrypted = imgTobyteArray(filename);
     byte[] key = imgTobyteArray(keyname);
     if(exchange.equals("DH")){
-    
+        int a = (int)(Math.random() * 300);
+        int b = (int)(Math.random() * 300);
+        DH.setG((int)(Math.random() * 300));
+        int secret;
+        BUFFER.put("ga",DH.getExponent(a));
+        BUFFER.put("gb",DH.getExponent(b));
+        int gab = DH.getExponent(BUFFER.get("ga"),b);
+        int gba = DH.getExponent(BUFFER.get("gb"),a);
+        if(gba != gab) System.out.println("SOMETHING HAS GONE HORRIBLY WRONG");
+        else secret = gab;
     }
     else if(exchange.equals("RSA")){
-    
-    
+        int p = 100537;
+        RSA.setP(p); //randomly taken from https://primes.utm.edu/lists/small/10000.txt
+        int e = (int)(Math.random()*1000);
+        int d = RSA.generateInverse(e,p);
+        //BUFFER.put
     }
     if(encryption.equals("DES ENCRYPT")){
         byte[] encrypted = DES.encryptCBC(unencrypted,key);
@@ -104,15 +116,12 @@ public static void doEverything(String exchange, String encryption, String filen
         byte[] encrypted = VEA.encrypt(unencrypted,key);
     }
     else if(encryption.equals("VEA DECRYPT")){
-    
-    
+        byte[] encrypted = VEA.decrypt(unencrypted,key);
     }
     else if(encryption.equals("POLYNOMIAL ENCRYPT")){
     
-    
     }
     else if(encryption.equals("POLYNOMIAL DECRYPT")){
-    
 
     }
 

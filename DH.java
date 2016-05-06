@@ -1,22 +1,25 @@
 public class DH{
-private int g = 123123;
-private int p = 1234535;
-    int getG(){
+private static int g = 20;
+private static int p = 1234535;
+    static int getG(){
         return g;
     }
-    int getP(){
+    static int getP(){
         return p;
     }
-    void setG(int gx){
+    static void setG(int gx){
         g = gx;
     }
-    void setP(int px){
+    static void setP(int px){
         p = px;
     }
-    int getPower(){
+    static int getPower(){
         return (int)(Math.random() * p);
     }
-    int getExponent(int a){
+    static int getExponent(int a){
         return (int)(Math.pow(g,a) % p);
+    }
+    static int getExponent(int a, int b){
+        return (int)(Math.pow(a,b) % p);
     }
 }
